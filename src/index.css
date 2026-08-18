@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #f8fafc;
+    --sidebar-bg: #ffffff;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-accent: #818cf8;
+    --card-border: #e2e8f0;
+    --card-hover: #f1f5f9;
+  }
+
+  .dark {
+    --bg-main: #0b0f19;
+    --sidebar-bg: #0f172a;
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-accent: #a5b4fc;
+    --card-border: #1e293b;
+    --card-hover: #1e293b/50;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', 'Inter', 'Mukta', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-main);
+  }
+}
+
+.font-marathi {
+  font-family: 'Mukta', system-ui, -apple-system, sans-serif;
+}
+
+/* Bento Card styling helpers */
+.bento-card {
+  border-radius: 1rem;
+  border: 1px solid var(--card-border);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bento-card:hover {
+  border-color: #818cf8;
+}
+
+/* Custom scrollbar for lesson tabs and content */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
+}
+
+
