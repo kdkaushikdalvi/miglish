@@ -14,8 +14,12 @@ import { ToBePage } from './pages/ToBePage';
 import { ToHavePage } from './pages/ToHavePage';
 import { PassiveVoicePage } from './pages/PassiveVoicePage';
 import { WhQuestionsPage } from './pages/WhQuestionsPage';
+import { WordsPage } from './pages/WordsPage';
+import { ModalsPage } from './pages/ModalsPage';
+import { DummySubjectPage } from './pages/DummySubjectPage';
+import { ForSincePage } from './pages/ForSincePage';
+import { CombinedTensesPage } from './pages/CombinedTensesPage';
 import { PARTS_OF_SPEECH } from './data/partsOfSpeech';
-import { MinglishLogo } from './components/MinglishLogo';
 import {
   getBookmarks,
   toggleBookmark,
@@ -338,6 +342,84 @@ export default function App() {
             />
           )}
 
+          {/* Words (Verbs & Nouns) Routing */}
+          {(activeView === 'words' ||
+            activeView === 'words-verbs' ||
+            activeView === 'words-nouns') && (
+            <WordsPage
+              initialTab={
+                activeView === 'words-nouns'
+                  ? 'nouns'
+                  : 'verbs'
+              }
+              onBackToHome={() => handleSelectView('home')}
+              isCompleted={completedLessons.includes('words')}
+              isBookmarked={bookmarks.includes('words')}
+              onToggleComplete={() => handleToggleComplete('words')}
+              onToggleBookmark={() => handleToggleBookmark('words')}
+            />
+          )}
+
+          {/* Modal Auxiliary Verbs Routing */}
+          {(activeView === 'modals' || activeView.startsWith('modal-')) && (
+            <ModalsPage
+              initialModal={
+                activeView.startsWith('modal-') && activeView !== 'modals'
+                  ? activeView.replace('modal-', '')
+                  : 'can'
+              }
+              onBackToHome={() => handleSelectView('home')}
+              onSelectTopic={handleSelectView}
+              isCompleted={completedLessons.includes('modals')}
+              isBookmarked={bookmarks.includes('modals')}
+              onToggleComplete={() => handleToggleComplete('modals')}
+              onToggleBookmark={() => handleToggleBookmark('modals')}
+            />
+          )}
+
+          {/* Dummy Subject (It & There) Routing */}
+          {(activeView === 'dummy-subject' ||
+            activeView === 'dummy-it' ||
+            activeView === 'dummy-there') && (
+            <DummySubjectPage
+              initialTopic={activeView}
+              onBackToHome={() => handleSelectView('home')}
+              isCompleted={completedLessons.includes('dummy-subject')}
+              isBookmarked={bookmarks.includes('dummy-subject')}
+              onToggleComplete={() => handleToggleComplete('dummy-subject')}
+              onToggleBookmark={() => handleToggleBookmark('dummy-subject')}
+            />
+          )}
+
+          {/* For vs Since Routing */}
+          {(activeView === 'for-since' ||
+            activeView === 'for-since-for' ||
+            activeView === 'for-since-since') && (
+            <ForSincePage
+              initialTopic={activeView}
+              onBackToHome={() => handleSelectView('home')}
+              isCompleted={completedLessons.includes('for-since')}
+              isBookmarked={bookmarks.includes('for-since')}
+              onToggleComplete={() => handleToggleComplete('for-since')}
+              onToggleBookmark={() => handleToggleBookmark('for-since')}
+            />
+          )}
+
+          {/* Combined Tenses Routing */}
+          {(activeView === 'combined-tenses' ||
+            activeView === 'combined-present' ||
+            activeView === 'combined-past' ||
+            activeView === 'combined-future') && (
+            <CombinedTensesPage
+              initialTopic={activeView}
+              onBackToHome={() => handleSelectView('home')}
+              isCompleted={completedLessons.includes('combined-tenses')}
+              isBookmarked={bookmarks.includes('combined-tenses')}
+              onToggleComplete={() => handleToggleComplete('combined-tenses')}
+              onToggleBookmark={() => handleToggleBookmark('combined-tenses')}
+            />
+          )}
+
           {activeView === 'noun' && currentPart && (
             <NounLesson
               part={currentPart}
@@ -362,6 +444,21 @@ export default function App() {
             !activeView.startsWith('passive-') &&
             activeView !== 'wh-questions' &&
             !activeView.startsWith('wh-') &&
+            activeView !== 'words' &&
+            activeView !== 'words-verbs' &&
+            activeView !== 'words-nouns' &&
+            activeView !== 'modals' &&
+            !activeView.startsWith('modal-') &&
+            activeView !== 'dummy-subject' &&
+            activeView !== 'dummy-it' &&
+            activeView !== 'dummy-there' &&
+            activeView !== 'for-since' &&
+            activeView !== 'for-since-for' &&
+            activeView !== 'for-since-since' &&
+            activeView !== 'combined-tenses' &&
+            activeView !== 'combined-present' &&
+            activeView !== 'combined-past' &&
+            activeView !== 'combined-future' &&
             !activeView.includes('tense') &&
             !activeView.includes('present') &&
             !activeView.includes('past') &&
@@ -393,97 +490,6 @@ export default function App() {
             )}
         </main>
       </div>
-
-      {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 py-6 text-center text-xs text-slate-500 dark:text-slate-400">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <MinglishLogo size="xs" />
-            <p>
-              <strong>Minglish</strong> — English Grammar in Marathi (शब्दांच्या जाती व १२ काळ)
-            </p>
-          </div>
-          <div className="flex items-center gap-4 flex-wrap justify-center">
-            <button
-              type="button"
-              onClick={() => handleSelectView('home')}
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Home
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectView('tenses')}
-              className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors font-medium text-amber-600 dark:text-amber-400"
-            >
-              Simple Present Tense
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectView('to-be')}
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors font-medium text-teal-600 dark:text-teal-400"
-            >
-              To Be
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectView('to-have')}
-              className="hover:text-teal-700 dark:hover:text-teal-400 transition-colors font-medium text-teal-700 dark:text-teal-400"
-            >
-              To Have
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectView('verbs-comparison')}
-              className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors font-medium text-emerald-600 dark:text-emerald-400"
-            >
-              Main vs Helping Verbs
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectView('cases')}
-              className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors font-medium text-purple-600 dark:text-purple-400"
-            >
-              Cases (विभक्ती)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectView('articles')}
-              className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors font-medium text-amber-600 dark:text-amber-400"
-            >
-              Articles (A/An/The)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectView('passive-voice')}
-              className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors font-medium text-purple-600 dark:text-purple-400"
-            >
-              Passive Voice (८ काळ)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectView('wh-questions')}
-              className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors font-medium text-violet-600 dark:text-violet-400"
-            >
-              WH Questions (९ शब्द)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectView('practice')}
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Sentence Practice
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectView('reference')}
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Cheat Sheet
-            </button>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

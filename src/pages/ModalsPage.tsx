@@ -31,6 +31,7 @@ import {
   MODAL_SUMMARY_LIST,
   MODAL_GOLDEN_RULES,
   MODAL_QUIZ_QUESTIONS,
+  getModalGroup,
 } from '../data/modals';
 import {
   ModalId,
@@ -99,7 +100,7 @@ export const ModalsPage: React.FC<ModalsPageProps> = ({
   // Filter modals list by category
   const visibleModals = useMemo(() => {
     if (selectedCategory === 'all') return ALL_MODALS_DATA;
-    return ALL_MODALS_DATA.filter((m) => m.primaryCategory === selectedCategory);
+    return ALL_MODALS_DATA.filter((m) => getModalGroup(m.id) === selectedCategory);
   }, [selectedCategory]);
 
   // Filter examples based on search query
@@ -315,7 +316,7 @@ export const ModalsPage: React.FC<ModalsPageProps> = ({
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
               <div className="bg-white/10 backdrop-blur-xs rounded-xl p-3 border border-white/10">
-                <span className="block text-2xl font-black text-amber-300">15</span>
+                <span className="block text-2xl font-black text-amber-300">{ALL_MODALS_DATA.length}</span>
                 <span className="text-xs text-indigo-100 font-medium">
                   Modals Covered
                 </span>
@@ -365,7 +366,7 @@ export const ModalsPage: React.FC<ModalsPageProps> = ({
               ))}
             </div>
 
-            {/* 15 Modals Horizontal Selector Pills */}
+            {/* Modals Horizontal Selector Pills */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -375,7 +376,7 @@ export const ModalsPage: React.FC<ModalsPageProps> = ({
                   </span>
                 </div>
                 <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                  {currentModalData.modalNumber} of 15: <strong className="text-indigo-600 dark:text-indigo-400">{currentModalData.name}</strong>
+                  {currentModalData.modalNumber} of {ALL_MODALS_DATA.length}: <strong className="text-indigo-600 dark:text-indigo-400">{currentModalData.name}</strong>
                 </span>
               </div>
 
@@ -777,7 +778,7 @@ export const ModalsPage: React.FC<ModalsPageProps> = ({
               )}
             </div>
 
-            {/* Quick 15 Modals Comparison Matrix Table */}
+            {/* Quick Modals Comparison Matrix Table */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -786,7 +787,7 @@ export const ModalsPage: React.FC<ModalsPageProps> = ({
                   </div>
                   <div>
                     <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100">
-                      All 15 Modals Quick Comparison Reference
+                      All Modals Quick Comparison Reference
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400 font-marathi">
                       सर्व १५ मोडाल्सचा मराठी अर्थ, प्रमुख उपयोग आणि नमुना वाक्ये

@@ -39,7 +39,7 @@ export const MinglishLogo: React.FC<MinglishLogoProps> = ({
       >
         {!imgError ? (
           <img
-            src="/logo.png"
+            src="/logo.svg"
             alt="Minglish Logo"
             referrerPolicy="no-referrer"
             onError={() => setImgError(true)}
