@@ -197,6 +197,17 @@ export const Home: React.FC<HomeProps> = ({
               </button>
 
               <button
+                id="hero-other-btn"
+                type="button"
+                onClick={() => onSelectPart('other')}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-sky-300 text-sky-950 hover:bg-sky-200 shadow-sm transition-all"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Other (इतर रचना)</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+
+              <button
                 id="hero-practice-btn"
                 type="button"
                 onClick={onOpenPractice}

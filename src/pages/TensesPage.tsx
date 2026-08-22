@@ -40,6 +40,7 @@ import {
 import { TENSES_COMPARATIVE_DATA } from '../data/comparativeTablesData';
 import { TenseSentenceForm } from '../types/tenseTypes';
 import { PdfDownloadButton } from '../components/PdfDownloadButton';
+import { SpeakingDailyRoutine } from '../components/SpeakingDailyRoutine';
 
 interface TensesPageProps {
   onBackToHome: () => void;
@@ -944,6 +945,13 @@ export const TensesPage: React.FC<TensesPageProps> = ({
           </div>
         </div>
       )}
+
+      {/* ========================================================================= */}
+      {/* SPEAKING PRACTICE: MY DAILY ROUTINE (Under Simple Present, Simple Past, Simple Future) */}
+      {/* ========================================================================= */}
+      {activeTenseId === 'simple-present' && <SpeakingDailyRoutine tense="simple-present" />}
+      {activeTenseId === 'simple-past' && <SpeakingDailyRoutine tense="simple-past" />}
+      {activeTenseId === 'simple-future' && <SpeakingDailyRoutine tense="simple-future" />}
 
       {/* ========================================================================= */}
       {/* INTERACTIVE SENTENCE BUILDER */}

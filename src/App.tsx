@@ -19,6 +19,7 @@ import { ModalsPage } from './pages/ModalsPage';
 import { DummySubjectPage } from './pages/DummySubjectPage';
 import { ForSincePage } from './pages/ForSincePage';
 import { CombinedTensesPage } from './pages/CombinedTensesPage';
+import { OtherPage } from './pages/OtherPage';
 import { PARTS_OF_SPEECH } from './data/partsOfSpeech';
 import {
   getBookmarks,
@@ -33,6 +34,41 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterSavedOnly, setFilterSavedOnly] = useState<boolean>(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
+
+  // Desktop sidebar collapse state with localStorage persistence
+  const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('minglish_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleDesktopSidebar = () => {
+    setIsDesktopSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('minglish_sidebar_collapsed', String(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  // Keyboard shortcut: Ctrl+B or Cmd+B to collapse/expand desktop sidebar
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        // Only toggle if not currently typing in an input or textarea
+        const activeTag = document.activeElement?.tagName.toLowerCase();
+        if (activeTag !== 'input' && activeTag !== 'textarea') {
+          e.preventDefault();
+          handleToggleDesktopSidebar();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Local storage reactive states
   const [bookmarks, setBookmarks] = useState<string[]>([]);
@@ -117,9 +153,11 @@ export default function App() {
         onSelectView={handleSelectView}
         isMobileSidebarOpen={isMobileSidebarOpen}
         onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+        isDesktopSidebarCollapsed={isDesktopSidebarCollapsed}
+        onToggleDesktopSidebar={handleToggleDesktopSidebar}
       />
 
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      <div className={`flex-1 flex ${isDesktopSidebarCollapsed ? 'max-w-7xl' : 'max-w-7xl'} w-full mx-auto transition-all duration-300`}>
         {/* Sidebar */}
         <Sidebar
           parts={PARTS_OF_SPEECH}
@@ -130,10 +168,12 @@ export default function App() {
           isOpenMobile={isMobileSidebarOpen}
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
           onCacheCleared={handleCacheCleared}
+          isDesktopCollapsed={isDesktopSidebarCollapsed}
+          onToggleDesktopCollapsed={handleToggleDesktopSidebar}
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 max-w-5xl overflow-x-hidden">
+        <main className={`flex-1 px-4 sm:px-6 lg:px-8 py-6 ${isDesktopSidebarCollapsed ? 'max-w-6xl' : 'max-w-5xl'} overflow-x-hidden transition-all duration-300`}>
           {activeView === 'home' && (
             <Home
               parts={PARTS_OF_SPEECH}
@@ -420,6 +460,30 @@ export default function App() {
             />
           )}
 
+          {/* Other Important Structures Routing */}
+          {(activeView === 'other' ||
+            activeView.startsWith('other-') ||
+            activeView === 'as-long-as' ||
+            activeView === 'unless-until' ||
+            activeView === 'by-the-time' ||
+            activeView === 'as-soon-as' ||
+            activeView === 'once') && (
+            <OtherPage
+              initialTopic={activeView}
+              onBackToHome={() => handleSelectView('home')}
+              isCompleted={
+                completedLessons.includes('other') ||
+                completedLessons.includes(activeView)
+              }
+              isBookmarked={
+                bookmarks.includes('other') ||
+                bookmarks.includes(activeView)
+              }
+              onToggleComplete={() => handleToggleComplete(activeView)}
+              onToggleBookmark={() => handleToggleBookmark(activeView)}
+            />
+          )}
+
           {activeView === 'noun' && currentPart && (
             <NounLesson
               part={currentPart}
@@ -459,6 +523,13 @@ export default function App() {
             activeView !== 'combined-present' &&
             activeView !== 'combined-past' &&
             activeView !== 'combined-future' &&
+            activeView !== 'other' &&
+            !activeView.startsWith('other-') &&
+            activeView !== 'as-long-as' &&
+            activeView !== 'unless-until' &&
+            activeView !== 'by-the-time' &&
+            activeView !== 'as-soon-as' &&
+            activeView !== 'once' &&
             !activeView.includes('tense') &&
             !activeView.includes('present') &&
             !activeView.includes('past') &&

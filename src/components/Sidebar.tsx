@@ -11,6 +11,7 @@ import {
   Home,
   CheckCircle2,
   Bookmark,
+  BookMarked,
   Award,
   HelpCircle,
   X,
@@ -35,6 +36,8 @@ import {
   CircleDot,
   Timer,
   GitMerge,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import { PartOfSpeech } from '../types';
 import { MinglishLogo } from './MinglishLogo';
@@ -61,6 +64,8 @@ interface SidebarProps {
   isOpenMobile: boolean;
   onCloseMobile: () => void;
   onCacheCleared?: () => void;
+  isDesktopCollapsed?: boolean;
+  onToggleDesktopCollapsed?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -72,15 +77,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpenMobile,
   onCloseMobile,
   onCacheCleared,
+  isDesktopCollapsed = false,
+  onToggleDesktopCollapsed,
 }) => {
   // Collapsible dropdown states - default to closed as requested
   const [isPosOpen, setIsPosOpen] = useState<boolean>(false);
   const [isToBeOpen, setIsToBeOpen] = useState<boolean>(false);
   const [isToHaveOpen, setIsToHaveOpen] = useState<boolean>(false);
   const [isTensesOpen, setIsTensesOpen] = useState<boolean>(false);
-  const [isPresentOpen, setIsPresentOpen] = useState<boolean>(false);
-  const [isPastOpen, setIsPastOpen] = useState<boolean>(false);
-  const [isFutureOpen, setIsFutureOpen] = useState<boolean>(false);
   const [isPassiveOpen, setIsPassiveOpen] = useState<boolean>(false);
   const [isWhQuestionsOpen, setIsWhQuestionsOpen] = useState<boolean>(false);
   const [isWordsOpen, setIsWordsOpen] = useState<boolean>(false);
@@ -88,6 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isDummySubjectOpen, setIsDummySubjectOpen] = useState<boolean>(false);
   const [isForSinceOpen, setIsForSinceOpen] = useState<boolean>(false);
   const [isCombinedTensesOpen, setIsCombinedTensesOpen] = useState<boolean>(false);
+  const [isOtherOpen, setIsOtherOpen] = useState<boolean>(false);
 
   // Clear cache state
   const [isClearModalOpen, setIsClearModalOpen] = useState<boolean>(false);
@@ -165,6 +170,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     'past-tense',
     'future-tense',
     'simple-present',
+    'simple-present-negative',
     'present-continuous',
     'present-perfect',
     'present-perfect-continuous',
@@ -202,6 +208,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     'future-perfect',
     'future-perfect-continuous',
   ].includes(activeId);
+
+  const isTensesActive =
+    isPresentActive ||
+    isPastActive ||
+    isFutureActive ||
+    activeId === 'tenses' ||
+    activeId.startsWith('tenses-');
 
   const isPassiveActive =
     activeId === 'passive-voice' ||
@@ -256,6 +269,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
     activeId === 'combined-past' ||
     activeId === 'combined-future';
 
+  const isOtherActive =
+    activeId === 'other' ||
+    activeId === 'other-as-long-as' ||
+    activeId === 'other-unless-until' ||
+    activeId === 'other-by-the-time' ||
+    activeId === 'other-as-soon-as' ||
+    activeId === 'other-once' ||
+    activeId === 'other-would-rather' ||
+    activeId === 'other-let-lets' ||
+    activeId === 'other-whenever' ||
+    activeId === 'other-wherever' ||
+    activeId === 'other-whomever' ||
+    activeId === 'other-whatever' ||
+    activeId === 'other-whichever' ||
+    activeId === 'other-however' ||
+    activeId === 'other-though-although' ||
+    activeId === 'other-make-causative' ||
+    activeId === 'other-get-causative' ||
+    activeId === 'as-long-as' ||
+    activeId === 'unless-until' ||
+    activeId === 'by-the-time' ||
+    activeId === 'as-soon-as' ||
+    activeId === 'once' ||
+    activeId === 'would-rather' ||
+    activeId === 'let-lets' ||
+    activeId === 'whenever' ||
+    activeId === 'wherever' ||
+    activeId === 'whomever' ||
+    activeId === 'whatever' ||
+    activeId === 'whichever' ||
+    activeId === 'however' ||
+    activeId === 'though-although' ||
+    activeId === 'make-causative' ||
+    activeId === 'get-causative';
+
   const navContent = (
     <div className="flex flex-col h-full justify-between p-4">
       <div>
@@ -278,8 +326,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Quick Menu / Overview */}
         <div className="mb-4">
-          <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500 mb-2 px-1">
-            Menu
+          <div className="flex items-center justify-between mb-2 px-1">
+            <span className="text-[11px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">
+              Menu
+            </span>
+            {onToggleDesktopCollapsed && (
+              <button
+                id="sidebar-desktop-collapse-btn"
+                type="button"
+                onClick={onToggleDesktopCollapsed}
+                className="hidden lg:inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[11px] font-semibold text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                title="Collapse sidebar (Ctrl+B)"
+              >
+                <PanelLeftClose className="w-3.5 h-3.5" />
+                <span>Collapse</span>
+              </button>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-1.5 mb-2">
@@ -862,185 +924,150 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             </button>
 
-            {/* Sub-items: Present, Past, Future Groups */}
+            {/* Sub-items: All 12 Tenses (Overview + Present + Past + Future) */}
             {isTensesOpen && (
               <div className="mt-1 ml-3.5 pl-3 border-l-2 border-amber-200 dark:border-amber-900/60 space-y-2 py-0.5 animate-in fade-in duration-150">
-                
-                {/* 1. Present Tense Group */}
-                <div className="space-y-1">
-                  <button
-                    id="sidebar-nav-present-tense-group"
-                    type="button"
-                    onClick={() => setIsPresentOpen((prev) => !prev)}
-                    className={`w-full flex items-center justify-between px-2 py-1 rounded-lg text-xs font-semibold transition-all ${
-                      isPresentActive
-                        ? 'bg-amber-100/80 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                      <span className="truncate">Present Tense</span>
-                      <span className="text-[10px] font-marathi text-slate-400 dark:text-slate-500 font-normal">
-                        (वर्तमान)
-                      </span>
-                    </div>
-                    {isPresentOpen ? (
-                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                    ) : (
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                    )}
-                  </button>
+                {/* 0. Overview & Compare Button */}
+                <button
+                  id="sidebar-nav-tenses-all-overview"
+                  type="button"
+                  onClick={() => handleItemClick('tenses')}
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    activeId === 'tenses'
+                      ? 'bg-amber-600 text-white font-bold shadow-xs'
+                      : 'text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40'
+                  }`}
+                >
+                  <span className="truncate">Overview & 12 Tenses Table</span>
+                  <span className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${activeId === 'tenses' ? 'text-amber-100' : 'text-amber-500'}`}>
+                    सर्व १२ काळ तुलना
+                  </span>
+                </button>
 
-                  {isPresentOpen && (
-                    <div className="ml-3 pl-2 border-l border-amber-200/80 dark:border-amber-900/40 space-y-0.5 py-0.5 animate-in fade-in duration-150">
-                      {[
-                        { id: 'simple-present', name: 'Simple Present', marathi: 'साधा' },
-                        { id: 'simple-present-negative', name: 'Simple Present [Negative]', marathi: 'नकारार्थी (Pg 10-12)', isSpecial: true },
-                        { id: 'present-continuous', name: 'Present Continuous', marathi: 'चालू' },
-                        { id: 'present-perfect', name: 'Present Perfect', marathi: 'पूर्ण' },
-                        { id: 'present-perfect-continuous', name: 'Present Perfect Cont.', marathi: 'चालू पूर्ण' },
-                      ].map((item) => {
-                        const isSelected = activeId === item.id || (item.id === 'simple-present' && (activeId === 'present-tense' || activeId === 'tenses'));
-                        return (
-                          <button
-                            key={item.id}
-                            id={`sidebar-nav-${item.id}`}
-                            type="button"
-                            onClick={() => handleItemClick(item.id)}
-                            className={`w-full flex items-center justify-between px-2 py-1 rounded-md text-[11px] transition-all ${
-                              isSelected
-                                ? 'bg-amber-600 text-white font-bold shadow-xs'
-                                : item.isSpecial
-                                ? 'text-amber-700 dark:text-amber-300 font-semibold hover:bg-amber-50 dark:hover:bg-amber-950/40'
-                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/70'
-                            }`}
-                          >
-                            <span className="truncate">{item.name}</span>
-                            <span className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${isSelected ? 'text-amber-100' : item.isSpecial ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-400'}`}>
-                              {item.marathi}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                {/* 1. Present Tense Group (1-4) */}
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-bold text-amber-800 dark:text-amber-300">
+                    <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                    <span>Present Tense</span>
+                    <span className="text-[10px] font-marathi text-amber-600/80 dark:text-amber-400/80 font-normal">
+                      (वर्तमानकाळ)
+                    </span>
+                  </div>
+                  <div className="space-y-0.5">
+                    {[
+                      { id: 'simple-present', num: '1.', name: 'Simple Present', marathi: 'साधा वर्तमान' },
+                      { id: 'present-continuous', num: '2.', name: 'Present Continuous', marathi: 'चालू वर्तमान' },
+                      { id: 'present-perfect', num: '3.', name: 'Present Perfect', marathi: 'पूर्ण वर्तमान' },
+                      { id: 'present-perfect-continuous', num: '4.', name: 'Present Perfect Cont.', marathi: 'चालू पूर्ण वर्तमान' },
+                    ].map((item) => {
+                      const isSelected = activeId === item.id || (item.id === 'simple-present' && activeId === 'present-tense');
+                      return (
+                        <button
+                          key={item.id}
+                          id={`sidebar-nav-${item.id}`}
+                          type="button"
+                          onClick={() => handleItemClick(item.id)}
+                          className={`w-full flex items-center justify-between px-2 py-1 rounded-md text-[11px] transition-all ${
+                            isSelected
+                              ? 'bg-amber-600 text-white font-bold shadow-xs'
+                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-[10px] text-slate-400 font-mono flex-shrink-0">{item.num}</span>
+                            <span className="truncate font-medium">{item.name}</span>
+                          </div>
+                          <span className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${isSelected ? 'text-amber-100' : 'text-slate-400'}`}>
+                            {item.marathi}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                {/* 2. Past Tense Group */}
-                <div className="space-y-1">
-                  <button
-                    id="sidebar-nav-past-tense-group"
-                    type="button"
-                    onClick={() => setIsPastOpen((prev) => !prev)}
-                    className={`w-full flex items-center justify-between px-2 py-1 rounded-lg text-xs font-semibold transition-all ${
-                      isPastActive
-                        ? 'bg-orange-100/80 dark:bg-orange-950/60 text-orange-900 dark:text-orange-200'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <History className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
-                      <span className="truncate">Past Tense</span>
-                      <span className="text-[10px] font-marathi text-slate-400 dark:text-slate-500 font-normal">
-                        (भूतकाळ)
-                      </span>
-                    </div>
-                    {isPastOpen ? (
-                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                    ) : (
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                    )}
-                  </button>
-
-                  {isPastOpen && (
-                    <div className="ml-3 pl-2 border-l border-orange-200/80 dark:border-orange-900/40 space-y-0.5 py-0.5 animate-in fade-in duration-150">
-                      {[
-                        { id: 'simple-past', name: 'Simple Past', marathi: 'साधा' },
-                        { id: 'past-continuous', name: 'Past Continuous', marathi: 'चालू' },
-                        { id: 'past-perfect', name: 'Past Perfect', marathi: 'पूर्ण' },
-                        { id: 'past-perfect-continuous', name: 'Past Perfect Cont.', marathi: 'चालू पूर्ण' },
-                      ].map((item) => {
-                        const isSelected = activeId === item.id || (item.id === 'simple-past' && activeId === 'past-tense');
-                        return (
-                          <button
-                            key={item.id}
-                            id={`sidebar-nav-${item.id}`}
-                            type="button"
-                            onClick={() => handleItemClick(item.id)}
-                            className={`w-full flex items-center justify-between px-2 py-1 rounded-md text-[11px] transition-all ${
-                              isSelected
-                                ? 'bg-orange-600 text-white font-bold shadow-xs'
-                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/70'
-                            }`}
-                          >
-                            <span className="truncate">{item.name}</span>
-                            <span className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${isSelected ? 'text-orange-100' : 'text-slate-400'}`}>
-                              {item.marathi}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                {/* 2. Past Tense Group (5-8) */}
+                <div className="space-y-1 pt-1 border-t border-amber-100 dark:border-amber-950/60">
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-bold text-orange-800 dark:text-orange-300">
+                    <History className="w-3 h-3 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                    <span>Past Tense</span>
+                    <span className="text-[10px] font-marathi text-orange-600/80 dark:text-orange-400/80 font-normal">
+                      (भूतकाळ)
+                    </span>
+                  </div>
+                  <div className="space-y-0.5">
+                    {[
+                      { id: 'simple-past', num: '5.', name: 'Simple Past', marathi: 'साधा भूतकाळ' },
+                      { id: 'past-continuous', num: '6.', name: 'Past Continuous', marathi: 'चालू भूतकाळ' },
+                      { id: 'past-perfect', num: '7.', name: 'Past Perfect', marathi: 'पूर्ण भूतकाळ' },
+                      { id: 'past-perfect-continuous', num: '8.', name: 'Past Perfect Cont.', marathi: 'चालू पूर्ण भूतकाळ' },
+                    ].map((item) => {
+                      const isSelected = activeId === item.id || (item.id === 'simple-past' && activeId === 'past-tense');
+                      return (
+                        <button
+                          key={item.id}
+                          id={`sidebar-nav-${item.id}`}
+                          type="button"
+                          onClick={() => handleItemClick(item.id)}
+                          className={`w-full flex items-center justify-between px-2 py-1 rounded-md text-[11px] transition-all ${
+                            isSelected
+                              ? 'bg-orange-600 text-white font-bold shadow-xs'
+                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-[10px] text-slate-400 font-mono flex-shrink-0">{item.num}</span>
+                            <span className="truncate font-medium">{item.name}</span>
+                          </div>
+                          <span className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${isSelected ? 'text-orange-100' : 'text-slate-400'}`}>
+                            {item.marathi}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                {/* 3. Future Tense Group */}
-                <div className="space-y-1">
-                  <button
-                    id="sidebar-nav-future-tense-group"
-                    type="button"
-                    onClick={() => setIsFutureOpen((prev) => !prev)}
-                    className={`w-full flex items-center justify-between px-2 py-1 rounded-lg text-xs font-semibold transition-all ${
-                      isFutureActive
-                        ? 'bg-rose-100/80 dark:bg-rose-950/60 text-rose-900 dark:text-rose-200'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <FastForward className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 flex-shrink-0" />
-                      <span className="truncate">Future Tense</span>
-                      <span className="text-[10px] font-marathi text-slate-400 dark:text-slate-500 font-normal">
-                        (भविष्यकाळ)
-                      </span>
-                    </div>
-                    {isFutureOpen ? (
-                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                    ) : (
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                    )}
-                  </button>
-
-                  {isFutureOpen && (
-                    <div className="ml-3 pl-2 border-l border-rose-200/80 dark:border-rose-900/40 space-y-0.5 py-0.5 animate-in fade-in duration-150">
-                      {[
-                        { id: 'simple-future', name: 'Simple Future', marathi: 'साधा' },
-                        { id: 'future-continuous', name: 'Future Continuous', marathi: 'चालू' },
-                        { id: 'future-perfect', name: 'Future Perfect', marathi: 'पूर्ण' },
-                        { id: 'future-perfect-continuous', name: 'Future Perfect Cont.', marathi: 'चालू पूर्ण' },
-                      ].map((item) => {
-                        const isSelected = activeId === item.id || (item.id === 'simple-future' && activeId === 'future-tense');
-                        return (
-                          <button
-                            key={item.id}
-                            id={`sidebar-nav-${item.id}`}
-                            type="button"
-                            onClick={() => handleItemClick(item.id)}
-                            className={`w-full flex items-center justify-between px-2 py-1 rounded-md text-[11px] transition-all ${
-                              isSelected
-                                ? 'bg-rose-600 text-white font-bold shadow-xs'
-                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/70'
-                            }`}
-                          >
-                            <span className="truncate">{item.name}</span>
-                            <span className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${isSelected ? 'text-rose-100' : 'text-slate-400'}`}>
-                              {item.marathi}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                {/* 3. Future Tense Group (9-12) */}
+                <div className="space-y-1 pt-1 border-t border-amber-100 dark:border-amber-950/60">
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-bold text-rose-800 dark:text-rose-300">
+                    <FastForward className="w-3 h-3 text-rose-600 dark:text-rose-400 flex-shrink-0" />
+                    <span>Future Tense</span>
+                    <span className="text-[10px] font-marathi text-rose-600/80 dark:text-rose-400/80 font-normal">
+                      (भविष्यकाळ)
+                    </span>
+                  </div>
+                  <div className="space-y-0.5">
+                    {[
+                      { id: 'simple-future', num: '9.', name: 'Simple Future', marathi: 'साधा भविष्यकाळ' },
+                      { id: 'future-continuous', num: '10.', name: 'Future Continuous', marathi: 'चालू भविष्यकाळ' },
+                      { id: 'future-perfect', num: '11.', name: 'Future Perfect', marathi: 'पूर्ण भविष्यकाळ' },
+                      { id: 'future-perfect-continuous', num: '12.', name: 'Future Perfect Cont.', marathi: 'चालू पूर्ण भविष्यकाळ' },
+                    ].map((item) => {
+                      const isSelected = activeId === item.id || (item.id === 'simple-future' && activeId === 'future-tense');
+                      return (
+                        <button
+                          key={item.id}
+                          id={`sidebar-nav-${item.id}`}
+                          type="button"
+                          onClick={() => handleItemClick(item.id)}
+                          className={`w-full flex items-center justify-between px-2 py-1 rounded-md text-[11px] transition-all ${
+                            isSelected
+                              ? 'bg-rose-600 text-white font-bold shadow-xs'
+                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-[10px] text-slate-400 font-mono flex-shrink-0">{item.num}</span>
+                            <span className="truncate font-medium">{item.name}</span>
+                          </div>
+                          <span className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${isSelected ? 'text-rose-100' : 'text-slate-400'}`}>
+                            {item.marathi}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
               </div>
@@ -1787,6 +1814,125 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             )}
           </div>
+
+          {/* 15. Other (इतर विशेष रचना — As long as, Unless/Until, By the time, As soon as, Once) ⌄ (Dropdown) */}
+          <div className="pt-1">
+            <button
+              id="sidebar-nav-other-header"
+              type="button"
+              onClick={() => setIsOtherOpen((prev) => !prev)}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                isOtherActive && !isOtherOpen
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : isOtherActive
+                  ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-900 dark:text-indigo-200 border border-indigo-300/80 dark:border-indigo-800'
+                  : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span
+                  className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-black flex-shrink-0 ${
+                    isOtherActive && !isOtherOpen
+                      ? 'bg-white/25 text-white'
+                      : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300'
+                  }`}
+                >
+                  15
+                </span>
+                <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
+                <div className="flex items-center gap-1.5 truncate">
+                  <span className="font-bold truncate">Other</span>
+                  <span className="text-[10px] font-marathi text-slate-400 dark:text-slate-500 font-normal">
+                    (इतर रचना)
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 flex-shrink-0">
+                {bookmarks.includes('other') && (
+                  <Bookmark className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
+                )}
+                {completedLessons.includes('other') && (
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                )}
+                {isOtherOpen ? (
+                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                )}
+              </div>
+            </button>
+
+            {isOtherOpen && (
+              <div className="mt-1 ml-3.5 pl-3 border-l-2 border-indigo-200 dark:border-indigo-900/60 space-y-1 py-0.5 animate-in fade-in duration-150">
+                <button
+                  id="sidebar-nav-other-overview"
+                  type="button"
+                  onClick={() => handleItemClick('other')}
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    activeId === 'other'
+                      ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                      : 'text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40'
+                  }`}
+                >
+                  <span className="truncate">Overview & Compare</span>
+                  <span className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${activeId === 'other' ? 'text-indigo-100' : 'text-indigo-500'}`}>
+                    सर्व १६ रचना
+                  </span>
+                </button>
+
+                {[
+                  { id: 'other-as-long-as', name: 'As long as', marathi: 'जोपर्यंत' },
+                  { id: 'other-unless-until', name: 'Unless / Until', marathi: 'अट vs वेळ' },
+                  { id: 'other-by-the-time', name: 'By the time', marathi: 'तोपर्यंत' },
+                  { id: 'other-as-soon-as', name: 'As soon as', marathi: 'क्षणी / लगेच' },
+                  { id: 'other-once', name: 'Once', marathi: 'एकदा का' },
+                  { id: 'other-would-rather', name: 'Would rather', marathi: 'अधिक पसंत करणे' },
+                  { id: 'other-let-lets', name: "Let & Let's", marathi: 'करू देणे / चला' },
+                  { id: 'other-whenever', name: 'Whenever', marathi: 'जेव्हा कधी' },
+                  { id: 'other-wherever', name: 'Wherever', marathi: 'जेथे कुठे' },
+                  { id: 'other-whomever', name: 'Whomever / Whoever', marathi: 'ज्याला कोणाला' },
+                  { id: 'other-whatever', name: 'Whatever', marathi: 'जे काही' },
+                  { id: 'other-whichever', name: 'Whichever', marathi: 'जे कोणते' },
+                  { id: 'other-however', name: 'However', marathi: 'कितीही / तरीसुद्धा' },
+                  { id: 'other-though-although', name: 'Though / Although', marathi: 'जरी... तरी' },
+                  { id: 'other-make-causative', name: 'Make (Causative)', marathi: 'करायला लावणे' },
+                  { id: 'other-get-causative', name: 'Get (Causative)', marathi: 'करून घेणे' },
+                ].map((item, idx) => {
+                  const isSelected =
+                    activeId === item.id ||
+                    activeId === item.id.replace('other-', '');
+                  return (
+                    <button
+                      key={item.id}
+                      id={`sidebar-nav-${item.id}`}
+                      type="button"
+                      onClick={() => handleItemClick(item.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        isSelected
+                          ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 truncate">
+                        <span className="text-[10px] text-slate-400 font-mono">{idx + 1}.</span>
+                        <span className="truncate font-semibold">{item.name}</span>
+                      </div>
+                      <span
+                        className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${
+                          isSelected
+                            ? 'text-indigo-100'
+                            : 'text-slate-400 dark:text-slate-500'
+                        }`}
+                      >
+                        {item.marathi}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </nav>
       </div>
 
@@ -1830,14 +1976,393 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </div>
   );
 
+  {/* Compact rail content when collapsed on desktop */}
+  const collapsedNavContent = (
+    <div className="flex flex-col h-full justify-between items-center py-3 px-1.5 w-16 select-none">
+      {/* Top action: Expand Sidebar button */}
+      <div className="flex flex-col items-center gap-2 w-full">
+        {onToggleDesktopCollapsed && (
+          <button
+            id="sidebar-expand-rail-btn"
+            type="button"
+            onClick={onToggleDesktopCollapsed}
+            className="group relative flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900 border border-indigo-200 dark:border-indigo-800 transition-all shadow-xs cursor-pointer"
+            title="Expand Sidebar (Ctrl+B)"
+          >
+            <PanelLeftOpen className="w-5 h-5" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex items-center px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              Expand Sidebar (विस्तार करा)
+            </div>
+          </button>
+        )}
+
+        <div className="w-8 h-px bg-slate-200 dark:bg-slate-800 my-0.5" />
+
+        {/* Scrollable compact icon list */}
+        <div className="flex flex-col items-center gap-1.5 w-full overflow-y-auto max-h-[calc(100vh-14rem)] py-1 no-scrollbar">
+          {/* Dashboard */}
+          <button
+            id="rail-nav-home"
+            type="button"
+            onClick={() => handleItemClick('home')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              activeId === 'home'
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Home className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>Dashboard</span>
+              <span className="text-[10px] text-slate-400 font-marathi">मुख्य पान</span>
+            </div>
+          </button>
+
+          {/* Quick Cheat Sheet */}
+          <button
+            id="rail-nav-reference"
+            type="button"
+            onClick={() => handleItemClick('reference')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              activeId === 'reference'
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>Cheat Sheet</span>
+              <span className="text-[10px] text-slate-400 font-marathi">तक्ता</span>
+            </div>
+          </button>
+
+          {/* Sentence Practice */}
+          <button
+            id="rail-nav-practice"
+            type="button"
+            onClick={() => handleItemClick('practice')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              activeId === 'practice'
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>Practice Mode</span>
+              <span className="text-[10px] text-slate-400 font-marathi">सराव</span>
+            </div>
+          </button>
+
+          <div className="w-8 h-px bg-slate-200 dark:bg-slate-800 my-1" />
+
+          {/* 1. Parts of Speech */}
+          <button
+            id="rail-nav-pos"
+            type="button"
+            onClick={() => handleItemClick('noun')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              parts.some((p) => p.id === activeId)
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>1. Parts of Speech</span>
+              <span className="text-[10px] text-blue-300 font-marathi">शब्दांच्या जाती (८)</span>
+            </div>
+          </button>
+
+          {/* 2. Articles */}
+          <button
+            id="rail-nav-articles"
+            type="button"
+            onClick={() => handleItemClick('articles')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              activeId === 'articles'
+                ? 'bg-emerald-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>2. Articles</span>
+              <span className="text-[10px] text-emerald-300 font-marathi">A, An, The (उपपदे)</span>
+            </div>
+          </button>
+
+          {/* 3. Cases */}
+          <button
+            id="rail-nav-cases"
+            type="button"
+            onClick={() => handleItemClick('cases')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              activeId === 'cases'
+                ? 'bg-purple-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <BookMarked className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>3. Cases (विभक्ती)</span>
+              <span className="text-[10px] text-purple-300 font-marathi">Nominative, Objective...</span>
+            </div>
+          </button>
+
+          {/* 4. Verbs Comparison */}
+          <button
+            id="rail-nav-verbs-comparison"
+            type="button"
+            onClick={() => handleItemClick('verbs-comparison')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              activeId === 'verbs-comparison'
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Compass className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>4. Main vs Helping Verbs</span>
+              <span className="text-[10px] text-indigo-300 font-marathi">मुख्य व सहाय्यकारी क्रियापदे</span>
+            </div>
+          </button>
+
+          {/* 5. To Be */}
+          <button
+            id="rail-nav-to-be"
+            type="button"
+            onClick={() => handleItemClick('to-be')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              isToBeActive
+                ? 'bg-cyan-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <span className="font-mono text-xs font-bold">Be</span>
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>5. 'To Be' Verbs</span>
+              <span className="text-[10px] text-cyan-300 font-marathi">अस्तित्व / स्थिती</span>
+            </div>
+          </button>
+
+          {/* 6. To Have */}
+          <button
+            id="rail-nav-to-have"
+            type="button"
+            onClick={() => handleItemClick('to-have')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              isToHaveActive
+                ? 'bg-teal-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <span className="font-mono text-xs font-bold">Hv</span>
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>6. 'To Have' Verbs</span>
+              <span className="text-[10px] text-teal-300 font-marathi">मालकी / असणे</span>
+            </div>
+          </button>
+
+          {/* 7. 12 Tenses */}
+          <button
+            id="rail-nav-tenses"
+            type="button"
+            onClick={() => handleItemClick('tenses')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              isTensesActive
+                ? 'bg-amber-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <div className="relative flex items-center justify-center">
+              <Clock className="w-4 h-4" />
+              <span className="absolute -bottom-1 -right-1 text-[8px] font-bold font-mono bg-amber-500 text-white rounded-full px-0.5 leading-none">12</span>
+            </div>
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>7. All 12 Tenses</span>
+              <span className="text-[10px] text-amber-300 font-marathi">१२ काळ (वर्तमान, भूत, भविष्य)</span>
+            </div>
+          </button>
+
+          {/* 8. Passive Voice */}
+          <button
+            id="rail-nav-passive"
+            type="button"
+            onClick={() => handleItemClick('passive-voice')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              isPassiveActive
+                ? 'bg-rose-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <RotateCcw className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>8. Passive Voice (कर्मणी प्रयोग)</span>
+              <span className="text-[10px] text-rose-300 font-marathi">८ काळांचे Passive Voice</span>
+            </div>
+          </button>
+
+          {/* 9. WH Questions */}
+          <button
+            id="rail-nav-wh"
+            type="button"
+            onClick={() => handleItemClick('wh-questions')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              isWhQuestionsActive
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <HelpCircle className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>9. WH Questions</span>
+              <span className="text-[10px] text-blue-300 font-marathi">प्रश्नार्थक शब्द (What, Why...)</span>
+            </div>
+          </button>
+
+          {/* 10. Words */}
+          <button
+            id="rail-nav-words"
+            type="button"
+            onClick={() => handleItemClick('words')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              isWordsActive
+                ? 'bg-teal-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <BookText className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>10. Words (शब्द संग्रह)</span>
+              <span className="text-[10px] text-teal-300 font-marathi">V1-V2-V3 Verbs & Nouns</span>
+            </div>
+          </button>
+
+          {/* 11. Modals */}
+          <button
+            id="rail-nav-modals"
+            type="button"
+            onClick={() => handleItemClick('modals')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              isModalsActive
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Award className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>11. Modal Auxiliaries</span>
+              <span className="text-[10px] text-indigo-300 font-marathi">Can, Could, Should...</span>
+            </div>
+          </button>
+
+          {/* 12. Dummy Subject */}
+          <button
+            id="rail-nav-dummy"
+            type="button"
+            onClick={() => handleItemClick('dummy-subject')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              isDummySubjectActive
+                ? 'bg-sky-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <CircleDot className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>12. Dummy Subject (It & There)</span>
+              <span className="text-[10px] text-sky-300 font-marathi">वेळ, हवामान, अस्तित्व</span>
+            </div>
+          </button>
+
+          {/* 13. For vs Since */}
+          <button
+            id="rail-nav-for-since"
+            type="button"
+            onClick={() => handleItemClick('for-since')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              isForSinceActive
+                ? 'bg-violet-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Timer className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>13. For vs Since</span>
+              <span className="text-[10px] text-violet-300 font-marathi">कालावधी vs ठरावीक वेळ</span>
+            </div>
+          </button>
+
+          {/* 14. Combined Tenses */}
+          <button
+            id="rail-nav-combined"
+            type="button"
+            onClick={() => handleItemClick('combined-tenses')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              isCombinedTensesActive
+                ? 'bg-fuchsia-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <GitMerge className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>14. Combined Tenses</span>
+              <span className="text-[10px] text-fuchsia-300 font-marathi">एकत्रित काळ रचना</span>
+            </div>
+          </button>
+
+          {/* 15. Other Structures */}
+          <button
+            id="rail-nav-other"
+            type="button"
+            onClick={() => handleItemClick('other')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              isOtherActive
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <div className="relative flex items-center justify-center">
+              <Sparkles className="w-4 h-4" />
+              <span className="absolute -bottom-1 -right-1 text-[8px] font-bold font-mono bg-indigo-500 text-white rounded-full px-0.5 leading-none">16</span>
+            </div>
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>15. Other Structures</span>
+              <span className="text-[10px] text-indigo-300 font-marathi">१६ महत्त्वाच्या रचना</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      {/* Bottom Clear Cache in Rail */}
+      <div className="pt-2 border-t border-slate-200 dark:border-slate-800 w-full flex flex-col items-center">
+        <button
+          id="rail-clear-cache-btn"
+          type="button"
+          onClick={handleOpenClearModal}
+          className="group relative flex items-center justify-center w-10 h-10 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+          title="Clear App Cache (कॅशे साफ करा)"
+        >
+          <Trash2 className="w-4 h-4" />
+          <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+            <span>Clear App Cache</span>
+            <span className="text-[10px] text-rose-300 font-marathi">कॅशे साफ करा</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <>
-      {/* Desktop fixed sidebar */}
+      {/* Desktop fixed sidebar (collapsible between w-72 and w-16) */}
       <aside
         id="desktop-sidebar"
-        className="hidden lg:block w-72 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm h-[calc(100vh-4.5rem)] sticky top-18 overflow-y-auto"
+        className={`hidden lg:block ${
+          isDesktopCollapsed ? 'w-16' : 'w-72'
+        } flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm h-[calc(100vh-4.5rem)] sticky top-18 overflow-y-auto transition-all duration-300 ease-in-out`}
       >
-        {navContent}
+        {isDesktopCollapsed ? collapsedNavContent : navContent}
       </aside>
 
       {/* Mobile Drawer */}

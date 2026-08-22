@@ -1,6 +1,6 @@
 {
   "name": "Minglish - English Grammar in Marathi",
-  "description": "Minglish: An interactive educational application for learning English Parts of Speech, Articles, Grammatical Cases (विभक्ती), Main vs Helping Verbs, 'To Be', 'To Have', all 12 Tenses, Passive Voice (8 Tenses), and WH Questions (9 WH-Words with Affirmative, Negative, Interrogative, and Negative Interrogative examples) with Marathi explanations, comparative tables, sentence structures, colorful PDF downloads, and interactive quizzes.",
+  "description": "Minglish: An interactive educational application for learning English Parts of Speech, Articles, Grammatical Cases (विभक्ती), Main vs Helping Verbs, 'To Be', 'To Have', all 12 Tenses, Passive Voice (8 Tenses), WH Questions, Words (Verbs & Nouns), Modals, Dummy Subject (It & There), For vs Since, Combined Tenses, and Other Important Structures (As long as, Unless/Until, By the time, As soon as, Once, Would rather, Let/Let's, Whenever, Wherever, Whomever/Whoever, Whatever, Whichever, However, Though/Although, Make & Get Causatives) with Marathi explanations, comparative tables, sentence structures, colorful PDF downloads, and interactive quizzes.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

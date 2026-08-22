@@ -8,6 +8,8 @@ import {
   Sparkles,
   BookMarked,
   Layers,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { MinglishLogo } from './MinglishLogo';
@@ -24,6 +26,8 @@ interface HeaderProps {
   onSelectView: (view: string) => void;
   isMobileSidebarOpen: boolean;
   onToggleMobileSidebar: () => void;
+  isDesktopSidebarCollapsed?: boolean;
+  onToggleDesktopSidebar?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -38,6 +42,8 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectView,
   isMobileSidebarOpen,
   onToggleMobileSidebar,
+  isDesktopSidebarCollapsed = false,
+  onToggleDesktopSidebar,
 }) => {
   return (
     <header
@@ -46,17 +52,36 @@ export const Header: React.FC<HeaderProps> = ({
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-18 gap-3 sm:gap-6">
-          {/* Left section: mobile hamburger & logo */}
-          <div className="flex items-center gap-3">
+          {/* Left section: mobile hamburger, desktop collapse & logo */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Mobile Drawer Toggle */}
             <button
               id="mobile-sidebar-toggle"
               type="button"
               onClick={onToggleMobileSidebar}
-              className="lg:hidden p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="lg:hidden p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               aria-label="Toggle navigation menu"
             >
               {isMobileSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
+
+            {/* Desktop Sidebar Collapse / Expand Toggle */}
+            {onToggleDesktopSidebar && (
+              <button
+                id="desktop-sidebar-toggle"
+                type="button"
+                onClick={onToggleDesktopSidebar}
+                className="hidden lg:flex items-center justify-center p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer"
+                title={isDesktopSidebarCollapsed ? "Expand Sidebar (Ctrl+B)" : "Collapse Sidebar (Ctrl+B)"}
+                aria-label={isDesktopSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                {isDesktopSidebarCollapsed ? (
+                  <PanelLeftOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                ) : (
+                  <PanelLeftClose className="w-5 h-5" />
+                )}
+              </button>
+            )}
 
             <button
               id="header-home-logo-btn"
