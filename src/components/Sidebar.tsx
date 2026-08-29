@@ -66,6 +66,7 @@ interface SidebarProps {
   onCacheCleared?: () => void;
   isDesktopCollapsed?: boolean;
   onToggleDesktopCollapsed?: () => void;
+  onExpandDesktop?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -79,6 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCacheCleared,
   isDesktopCollapsed = false,
   onToggleDesktopCollapsed,
+  onExpandDesktop,
 }) => {
   // Collapsible dropdown states - default to closed as requested
   const [isPosOpen, setIsPosOpen] = useState<boolean>(false);
@@ -137,6 +139,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const handleItemClick = (id: string) => {
     onSelect(id);
     onCloseMobile();
+  };
+
+  const handleOpenFromCollapsed = () => {
+    if (isDesktopCollapsed) {
+      if (onExpandDesktop) {
+        onExpandDesktop();
+      } else if (onToggleDesktopCollapsed) {
+        onToggleDesktopCollapsed();
+      }
+    }
   };
 
   const isToBeActive = [
@@ -344,63 +356,67 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-1.5 mb-2">
-            {/* Home overview */}
+          <div className="space-y-1">
+            {/* 1. Home Dashboard */}
             <button
               id="sidebar-nav-home"
               type="button"
               onClick={() => handleItemClick('home')}
-              className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 activeId === 'home'
                   ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
-              <Home className="w-3.5 h-3.5" />
-              <span>Dashboard</span>
+              <div className="flex items-center gap-2.5">
+                <Home className="w-4 h-4 text-indigo-500" />
+                <span>Dashboard</span>
+              </div>
             </button>
 
-            {/* Quick Reference Table link */}
+            {/* 2. Cheat Sheet / Reference */}
             <button
               id="sidebar-nav-reference"
               type="button"
               onClick={() => handleItemClick('reference')}
-              className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 activeId === 'reference'
                   ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
-              <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span>Cheat Sheet</span>
+              <div className="flex items-center gap-2.5">
+                <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
+                <span>Cheat Sheet (तक्ता)</span>
+              </div>
             </button>
-          </div>
 
-          {/* Quick Sentence Practice link */}
-          <button
-            id="sidebar-nav-practice"
-            type="button"
-            onClick={() => handleItemClick('practice')}
-            className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
-              activeId === 'practice'
-                ? 'bg-indigo-600 text-white font-bold shadow-sm'
-                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>Sentence Practice</span>
-            </div>
-            <span
-              className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+            {/* 3. Sentence Practice */}
+            <button
+              id="sidebar-nav-practice"
+              type="button"
+              onClick={() => handleItemClick('practice')}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 activeId === 'practice'
-                  ? 'bg-indigo-700 text-white'
-                  : 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
-              Interactive
-            </span>
-          </button>
+              <div className="flex items-center gap-2.5">
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                <span>Sentence Practice</span>
+              </div>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                  activeId === 'practice'
+                    ? 'bg-indigo-700 text-white'
+                    : 'bg-amber-100 text-amber-800'
+                }`}
+              >
+                Interactive
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Ordered Grammar Topics Section Header */}
@@ -412,7 +428,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Main Ordered Navigation List */}
         <nav className="space-y-1">
-          {/* 1. Article */}
+          {/* 1. Articles */}
           <button
             id="sidebar-nav-articles"
             type="button"
@@ -474,310 +490,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </button>
 
-          {/* 2. Main vs Helping Verb */}
-          <button
-            id="sidebar-nav-verbs-comparison"
-            type="button"
-            onClick={() => handleItemClick('verbs-comparison')}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
-              activeId === 'verbs-comparison' || activeId === 'verbs'
-                ? 'bg-emerald-600 text-white font-bold shadow-sm'
-                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <span
-                className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-black flex-shrink-0 ${
-                  activeId === 'verbs-comparison' || activeId === 'verbs'
-                    ? 'bg-white/25 text-white'
-                    : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                }`}
-              >
-                2
-              </span>
-              <Zap className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-              <span className="font-semibold truncate">
-                Main vs Helping Verb
-              </span>
-            </div>
-            <div className="flex items-center gap-1 flex-shrink-0 ml-1">
-              {bookmarks.includes('verbs-comparison') && (
-                <Bookmark
-                  className={`w-3.5 h-3.5 fill-amber-400 ${
-                    activeId === 'verbs-comparison' || activeId === 'verbs'
-                      ? 'text-amber-300'
-                      : 'text-amber-500'
-                  }`}
-                />
-              )}
-              {completedLessons.includes('verbs-comparison') && (
-                <CheckCircle2
-                  className={`w-3.5 h-3.5 ${
-                    activeId === 'verbs-comparison' || activeId === 'verbs'
-                      ? 'text-white'
-                      : 'text-emerald-500'
-                  }`}
-                />
-              )}
-              <span
-                className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
-                  activeId === 'verbs-comparison' || activeId === 'verbs'
-                    ? 'bg-emerald-700 text-white'
-                    : 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
-                }`}
-              >
-                क्रियापद
-              </span>
-            </div>
-          </button>
-
-          {/* 3. To Be (क्रिया नसणे) ⌄ (Dropdown) */}
+          {/* 2. Part of Speech ⌄ (Dropdown) */}
           <div className="pt-0.5">
-            <button
-              id="sidebar-nav-to-be-header"
-              type="button"
-              onClick={() => setIsToBeOpen((prev) => !prev)}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                isToBeActive && !isToBeOpen
-                  ? 'bg-teal-600 text-white'
-                  : isToBeActive
-                  ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-900 dark:text-teal-200 border border-teal-300/80 dark:border-teal-800'
-                  : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40'
-              }`}
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <span
-                  className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-black flex-shrink-0 ${
-                    isToBeActive
-                      ? 'bg-teal-600 text-white'
-                      : 'bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300'
-                  }`}
-                >
-                  3
-                </span>
-                <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
-                <div className="flex items-center gap-1.5 truncate">
-                  <span className="font-bold truncate">To Be</span>
-                  <span className="text-[10px] font-marathi text-slate-400 dark:text-slate-500 font-normal">
-                    (क्रिया नसणे)
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1 flex-shrink-0">
-                {isToBeOpen ? (
-                  <ChevronDown className="w-4 h-4 text-slate-400" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                )}
-              </div>
-            </button>
-
-            {/* Sub-items: Present, Past, Future */}
-            {isToBeOpen && (
-              <div className="mt-1 ml-3.5 pl-3 border-l-2 border-teal-300 dark:border-teal-800 space-y-0.5 py-0.5 animate-in fade-in duration-150">
-                {[
-                  {
-                    id: 'to-be-present',
-                    name: 'Present (Am / Is / Are)',
-                    marathi: 'आहे / नाही (Pg 23-24)',
-                    tense: 'present',
-                  },
-                  {
-                    id: 'to-be-past',
-                    name: 'Past (Was / Were)',
-                    marathi: 'होता / नव्हता (Pg 40-41)',
-                    tense: 'past',
-                  },
-                  {
-                    id: 'to-be-future',
-                    name: 'Future (Will be)',
-                    marathi: 'असेल / नसेल',
-                    tense: 'future',
-                  },
-                ].map((item) => {
-                  const isSelected =
-                    activeId === item.id ||
-                    (item.tense === 'present' && activeId === 'to-be');
-                  return (
-                    <button
-                      key={item.id}
-                      id={`sidebar-nav-${item.id}`}
-                      type="button"
-                      onClick={() => handleItemClick(item.id)}
-                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                        isSelected
-                          ? 'bg-teal-600 text-white font-bold shadow-xs'
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                      }`}
-                    >
-                      <span className="truncate">{item.name}</span>
-                      <span
-                        className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${
-                          isSelected
-                            ? 'text-teal-100'
-                            : 'text-slate-400 dark:text-slate-500'
-                        }`}
-                      >
-                        {item.marathi}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* 4. To Have (जवळ असणे / मालकी) ⌄ (Dropdown) */}
-          <div className="pt-0.5">
-            <button
-              id="sidebar-nav-to-have-header"
-              type="button"
-              onClick={() => setIsToHaveOpen((prev) => !prev)}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                isToHaveActive && !isToHaveOpen
-                  ? 'bg-teal-700 text-white'
-                  : isToHaveActive
-                  ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-900 dark:text-teal-200 border border-teal-300/80 dark:border-teal-800'
-                  : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40'
-              }`}
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <span
-                  className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-black flex-shrink-0 ${
-                    isToHaveActive
-                      ? 'bg-teal-700 text-white'
-                      : 'bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300'
-                  }`}
-                >
-                  4
-                </span>
-                <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
-                <div className="flex items-center gap-1.5 truncate">
-                  <span className="font-bold truncate">To Have</span>
-                  <span className="text-[10px] font-marathi text-slate-400 dark:text-slate-500 font-normal">
-                    (जवळ असणे)
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1 flex-shrink-0">
-                {isToHaveOpen ? (
-                  <ChevronDown className="w-4 h-4 text-slate-400" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                )}
-              </div>
-            </button>
-
-            {/* Sub-items: Present, Past, Future */}
-            {isToHaveOpen && (
-              <div className="mt-1 ml-3.5 pl-3 border-l-2 border-teal-400 dark:border-teal-800 space-y-0.5 py-0.5 animate-in fade-in duration-150">
-                {[
-                  {
-                    id: 'to-have-present',
-                    name: 'Present (Have / Has)',
-                    marathi: 'जवळ आहे (वर्तमान)',
-                    tense: 'present',
-                  },
-                  {
-                    id: 'to-have-past',
-                    name: 'Past (Had)',
-                    marathi: 'जवळ होते (भूतकाळ)',
-                    tense: 'past',
-                  },
-                  {
-                    id: 'to-have-future',
-                    name: 'Future (Will have)',
-                    marathi: 'जवळ असेल (भविष्य)',
-                    tense: 'future',
-                  },
-                ].map((item) => {
-                  const isSelected =
-                    activeId === item.id ||
-                    (item.tense === 'present' && activeId === 'to-have');
-                  return (
-                    <button
-                      key={item.id}
-                      id={`sidebar-nav-${item.id}`}
-                      type="button"
-                      onClick={() => handleItemClick(item.id)}
-                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                        isSelected
-                          ? 'bg-teal-700 text-white font-bold shadow-xs'
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                      }`}
-                    >
-                      <span className="truncate">{item.name}</span>
-                      <span
-                        className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${
-                          isSelected
-                            ? 'text-teal-100'
-                            : 'text-slate-400 dark:text-slate-500'
-                        }`}
-                      >
-                        {item.marathi}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* 5. Cases */}
-          <button
-            id="sidebar-nav-cases"
-            type="button"
-            onClick={() => handleItemClick('cases')}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
-              activeId === 'cases'
-                ? 'bg-purple-600 text-white font-bold shadow-sm'
-                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <span
-                className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-black flex-shrink-0 ${
-                  activeId === 'cases'
-                    ? 'bg-white/25 text-white'
-                    : 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300'
-                }`}
-              >
-                5
-              </span>
-              <Layers className="w-4 h-4 text-purple-500 flex-shrink-0" />
-              <span className="font-semibold truncate">Cases</span>
-            </div>
-            <div className="flex items-center gap-1 flex-shrink-0 ml-1">
-              {bookmarks.includes('cases') && (
-                <Bookmark
-                  className={`w-3.5 h-3.5 fill-amber-400 ${
-                    activeId === 'cases' ? 'text-amber-300' : 'text-amber-500'
-                  }`}
-                />
-              )}
-              {completedLessons.includes('cases') && (
-                <CheckCircle2
-                  className={`w-3.5 h-3.5 ${
-                    activeId === 'cases' ? 'text-white' : 'text-emerald-500'
-                  }`}
-                />
-              )}
-              <span
-                className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
-                  activeId === 'cases'
-                    ? 'bg-purple-700 text-white'
-                    : 'bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
-                }`}
-              >
-                विभक्ती
-              </span>
-            </div>
-          </button>
-
-          {/* 6. Part of Speech ⌄ (Dropdown) */}
-          <div className="pt-1">
             <button
               id="sidebar-nav-pos-header"
               type="button"
@@ -796,7 +510,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300'
                   }`}
                 >
-                  6
+                  2
                 </span>
                 <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
                 <div className="flex items-center gap-1.5 truncate">
@@ -877,6 +591,308 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           />
                         )}
                       </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 3. Main vs Helping Verb */}
+          <button
+            id="sidebar-nav-verbs-comparison"
+            type="button"
+            onClick={() => handleItemClick('verbs-comparison')}
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all cursor-pointer ${
+              activeId === 'verbs-comparison' || activeId === 'verbs'
+                ? 'bg-emerald-600 text-white font-bold shadow-sm'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span
+                className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-black flex-shrink-0 ${
+                  activeId === 'verbs-comparison' || activeId === 'verbs'
+                    ? 'bg-white/25 text-white'
+                    : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                }`}
+              >
+                3
+              </span>
+              <Zap className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+              <span className="font-semibold truncate">
+                Main vs Helping Verb
+              </span>
+            </div>
+            <div className="flex items-center gap-1 flex-shrink-0 ml-1">
+              {bookmarks.includes('verbs-comparison') && (
+                <Bookmark
+                  className={`w-3.5 h-3.5 fill-amber-400 ${
+                    activeId === 'verbs-comparison' || activeId === 'verbs'
+                      ? 'text-amber-300'
+                      : 'text-amber-500'
+                  }`}
+                />
+              )}
+              {completedLessons.includes('verbs-comparison') && (
+                <CheckCircle2
+                  className={`w-3.5 h-3.5 ${
+                    activeId === 'verbs-comparison' || activeId === 'verbs'
+                      ? 'text-white'
+                      : 'text-emerald-500'
+                  }`}
+                />
+              )}
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                  activeId === 'verbs-comparison' || activeId === 'verbs'
+                    ? 'bg-emerald-700 text-white'
+                    : 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                }`}
+              >
+                क्रियापद
+              </span>
+            </div>
+          </button>
+
+          {/* 4. Cases */}
+          <button
+            id="sidebar-nav-cases"
+            type="button"
+            onClick={() => handleItemClick('cases')}
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all cursor-pointer ${
+              activeId === 'cases'
+                ? 'bg-purple-600 text-white font-bold shadow-sm'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span
+                className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-black flex-shrink-0 ${
+                  activeId === 'cases'
+                    ? 'bg-white/25 text-white'
+                    : 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300'
+                }`}
+              >
+                4
+              </span>
+              <Layers className="w-4 h-4 text-purple-500 flex-shrink-0" />
+              <span className="font-semibold truncate">Cases</span>
+            </div>
+            <div className="flex items-center gap-1 flex-shrink-0 ml-1">
+              {bookmarks.includes('cases') && (
+                <Bookmark
+                  className={`w-3.5 h-3.5 fill-amber-400 ${
+                    activeId === 'cases' ? 'text-amber-300' : 'text-amber-500'
+                  }`}
+                />
+              )}
+              {completedLessons.includes('cases') && (
+                <CheckCircle2
+                  className={`w-3.5 h-3.5 ${
+                    activeId === 'cases' ? 'text-white' : 'text-emerald-500'
+                  }`}
+                />
+              )}
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                  activeId === 'cases'
+                    ? 'bg-purple-700 text-white'
+                    : 'bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
+                }`}
+              >
+                विभक्ती
+              </span>
+            </div>
+          </button>
+
+          {/* 5. To Be (क्रिया नसणे) ⌄ (Dropdown) */}
+          <div className="pt-0.5">
+            <button
+              id="sidebar-nav-to-be-header"
+              type="button"
+              onClick={() => setIsToBeOpen((prev) => !prev)}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                isToBeActive && !isToBeOpen
+                  ? 'bg-teal-600 text-white'
+                  : isToBeActive
+                  ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-900 dark:text-teal-200 border border-teal-300/80 dark:border-teal-800'
+                  : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span
+                  className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-black flex-shrink-0 ${
+                    isToBeActive
+                      ? 'bg-teal-600 text-white'
+                      : 'bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300'
+                  }`}
+                >
+                  5
+                </span>
+                <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+                <div className="flex items-center gap-1.5 truncate">
+                  <span className="font-bold truncate">To Be</span>
+                  <span className="text-[10px] font-marathi text-slate-400 dark:text-slate-500 font-normal">
+                    (क्रिया नसणे)
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 flex-shrink-0">
+                {isToBeOpen ? (
+                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                )}
+              </div>
+            </button>
+
+            {/* Sub-items: Present, Past, Future */}
+            {isToBeOpen && (
+              <div className="mt-1 ml-3.5 pl-3 border-l-2 border-teal-300 dark:border-teal-800 space-y-0.5 py-0.5 animate-in fade-in duration-150">
+                {[
+                  {
+                    id: 'to-be-present',
+                    name: 'Present (Am / Is / Are)',
+                    marathi: 'आहे / नाही (Pg 23-24)',
+                    tense: 'present',
+                  },
+                  {
+                    id: 'to-be-past',
+                    name: 'Past (Was / Were)',
+                    marathi: 'होता / नव्हता (Pg 40-41)',
+                    tense: 'past',
+                  },
+                  {
+                    id: 'to-be-future',
+                    name: 'Future (Will be)',
+                    marathi: 'असेल / नसेल',
+                    tense: 'future',
+                  },
+                ].map((item) => {
+                  const isSelected =
+                    activeId === item.id ||
+                    (item.tense === 'present' && activeId === 'to-be');
+                  return (
+                    <button
+                      key={item.id}
+                      id={`sidebar-nav-${item.id}`}
+                      type="button"
+                      onClick={() => handleItemClick(item.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        isSelected
+                          ? 'bg-teal-600 text-white font-bold shadow-xs'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <span className="truncate">{item.name}</span>
+                      <span
+                        className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${
+                          isSelected
+                            ? 'text-teal-100'
+                            : 'text-slate-400 dark:text-slate-500'
+                        }`}
+                      >
+                        {item.marathi}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 6. To Have (जवळ असणे / मालकी) ⌄ (Dropdown) */}
+          <div className="pt-0.5">
+            <button
+              id="sidebar-nav-to-have-header"
+              type="button"
+              onClick={() => setIsToHaveOpen((prev) => !prev)}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                isToHaveActive && !isToHaveOpen
+                  ? 'bg-teal-700 text-white'
+                  : isToHaveActive
+                  ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-900 dark:text-teal-200 border border-teal-300/80 dark:border-teal-800'
+                  : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span
+                  className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-black flex-shrink-0 ${
+                    isToHaveActive
+                      ? 'bg-teal-700 text-white'
+                      : 'bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300'
+                  }`}
+                >
+                  6
+                </span>
+                <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+                <div className="flex items-center gap-1.5 truncate">
+                  <span className="font-bold truncate">To Have</span>
+                  <span className="text-[10px] font-marathi text-slate-400 dark:text-slate-500 font-normal">
+                    (जवळ असणे)
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 flex-shrink-0">
+                {isToHaveOpen ? (
+                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                )}
+              </div>
+            </button>
+
+            {/* Sub-items: Present, Past, Future */}
+            {isToHaveOpen && (
+              <div className="mt-1 ml-3.5 pl-3 border-l-2 border-teal-400 dark:border-teal-800 space-y-0.5 py-0.5 animate-in fade-in duration-150">
+                {[
+                  {
+                    id: 'to-have-present',
+                    name: 'Present (Have / Has)',
+                    marathi: 'जवळ आहे (वर्तमान)',
+                    tense: 'present',
+                  },
+                  {
+                    id: 'to-have-past',
+                    name: 'Past (Had)',
+                    marathi: 'जवळ होते (भूतकाळ)',
+                    tense: 'past',
+                  },
+                  {
+                    id: 'to-have-future',
+                    name: 'Future (Will have)',
+                    marathi: 'जवळ असेल (भविष्य)',
+                    tense: 'future',
+                  },
+                ].map((item) => {
+                  const isSelected =
+                    activeId === item.id ||
+                    (item.tense === 'present' && activeId === 'to-have');
+                  return (
+                    <button
+                      key={item.id}
+                      id={`sidebar-nav-${item.id}`}
+                      type="button"
+                      onClick={() => handleItemClick(item.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        isSelected
+                          ? 'bg-teal-700 text-white font-bold shadow-xs'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <span className="truncate">{item.name}</span>
+                      <span
+                        className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${
+                          isSelected
+                            ? 'text-teal-100'
+                            : 'text-slate-400 dark:text-slate-500'
+                        }`}
+                      >
+                        {item.marathi}
+                      </span>
                     </button>
                   );
                 })}
@@ -1295,110 +1311,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
 
-          {/* 10. Words (शब्दसंग्रह - क्रियापदे व नाम) ⌄ (Dropdown) */}
-          <div className="pt-1">
-            <button
-              id="sidebar-nav-words-header"
-              type="button"
-              onClick={() => setIsWordsOpen((prev) => !prev)}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                isWordsActive && !isWordsOpen
-                  ? 'bg-rose-600 text-white shadow-sm'
-                  : isWordsActive
-                  ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-200 border border-rose-300/80 dark:border-rose-800'
-                  : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40'
-              }`}
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <span
-                  className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-black flex-shrink-0 ${
-                    isWordsActive && !isWordsOpen
-                      ? 'bg-white/25 text-white'
-                      : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
-                  }`}
-                >
-                  10
-                </span>
-                <BookText className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0" />
-                <div className="flex items-center gap-1.5 truncate">
-                  <span className="font-bold truncate">Words</span>
-                  <span className="text-[10px] font-marathi text-slate-400 dark:text-slate-500 font-normal">
-                    (शब्द)
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1 flex-shrink-0">
-                {bookmarks.includes('words') && (
-                  <Bookmark className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
-                )}
-                {completedLessons.includes('words') && (
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                )}
-                {isWordsOpen ? (
-                  <ChevronDown className="w-4 h-4 text-slate-400" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                )}
-              </div>
-            </button>
-
-            {isWordsOpen && (
-              <div className="mt-1 ml-3.5 pl-3 border-l-2 border-rose-200 dark:border-rose-900/60 space-y-1 py-0.5 animate-in fade-in duration-150">
-                <button
-                  id="sidebar-nav-words-overview"
-                  type="button"
-                  onClick={() => handleItemClick('words')}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    activeId === 'words'
-                      ? 'bg-rose-600 text-white font-bold shadow-xs'
-                      : 'text-rose-700 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40'
-                  }`}
-                >
-                  <span className="truncate">Overview</span>
-                  <span className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${activeId === 'words' ? 'text-rose-100' : 'text-rose-500'}`}>
-                    सर्व शब्द
-                  </span>
-                </button>
-
-                {[
-                  { id: 'words-verbs', name: 'Verbs', marathi: '१०० क्रियापदे (V¹-V³)' },
-                  { id: 'words-nouns', name: 'Nouns', marathi: '५० नाम' },
-                ].map((item, idx) => {
-                  const isSelected = activeId === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      id={`sidebar-nav-${item.id}`}
-                      type="button"
-                      onClick={() => handleItemClick(item.id)}
-                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                        isSelected
-                          ? 'bg-rose-600 text-white font-bold shadow-xs'
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5 truncate">
-                        <span className="text-[10px] text-slate-400 font-mono">{idx + 1}.</span>
-                        <span className="truncate font-semibold">{item.name}</span>
-                      </div>
-                      <span
-                        className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${
-                          isSelected
-                            ? 'text-rose-100'
-                            : 'text-slate-400 dark:text-slate-500'
-                        }`}
-                      >
-                        {item.marathi}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* 11. Modal Auxiliary (मोडाल सहाय्यकारी क्रियापदे) ⌄ (Dropdown) */}
+          {/* 10. Modal Auxiliary (मोडाल सहाय्यकारी क्रियापदे) ⌄ (Dropdown) */}
           <div className="pt-1">
             <button
               id="sidebar-nav-modals-header"
@@ -1420,7 +1333,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300'
                   }`}
                 >
-                  11
+                  10
                 </span>
                 <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
                 <div className="flex items-center gap-1.5 truncate">
@@ -1505,7 +1418,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
 
-          {/* 12. Dummy Subject (निरर्थक कर्ता — It & There) ⌄ (Dropdown) */}
+          {/* 11. Dummy Subject (निरर्थक कर्ता — It & There) ⌄ (Dropdown) */}
           <div className="pt-1">
             <button
               id="sidebar-nav-dummy-subject-header"
@@ -1527,7 +1440,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       : 'bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300'
                   }`}
                 >
-                  12
+                  11
                 </span>
                 <CircleDot className="w-4 h-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
                 <div className="flex items-center gap-1.5 truncate">
@@ -1608,7 +1521,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
 
-          {/* 13. For vs Since (कालावधी vs सुरुवातीचा वेळ) ⌄ (Dropdown) */}
+          {/* 12. For vs Since (कालावधी vs सुरुवातीचा वेळ) ⌄ (Dropdown) */}
           <div className="pt-1">
             <button
               id="sidebar-nav-for-since-header"
@@ -1630,7 +1543,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
                   }`}
                 >
-                  13
+                  12
                 </span>
                 <Timer className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
                 <div className="flex items-center gap-1.5 truncate">
@@ -1711,7 +1624,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
 
-          {/* 14. Combined Tenses (संयुक्त काळ) ⌄ (Dropdown) */}
+          {/* 13. Combined Tenses (संयुक्त काळ) ⌄ (Dropdown) */}
           <div className="pt-1">
             <button
               id="sidebar-nav-combined-tenses-header"
@@ -1733,7 +1646,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       : 'bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300'
                   }`}
                 >
-                  14
+                  13
                 </span>
                 <GitMerge className="w-4 h-4 text-violet-600 dark:text-violet-400 flex-shrink-0" />
                 <div className="flex items-center gap-1.5 truncate">
@@ -1815,7 +1728,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
 
-          {/* 15. Other (इतर विशेष रचना — As long as, Unless/Until, By the time, As soon as, Once) ⌄ (Dropdown) */}
+          {/* 14. Other (इतर विशेष रचना — As long as, Unless/Until, By the time, As soon as, Once) ⌄ (Dropdown) */}
           <div className="pt-1">
             <button
               id="sidebar-nav-other-header"
@@ -1837,7 +1750,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300'
                   }`}
                 >
-                  15
+                  14
                 </span>
                 <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
                 <div className="flex items-center gap-1.5 truncate">
@@ -1933,6 +1846,109 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             )}
           </div>
+
+          {/* 15. Words (शब्दसंग्रह - क्रियापदे व नाम) ⌄ (Dropdown) */}
+          <div className="pt-1">
+            <button
+              id="sidebar-nav-words-header"
+              type="button"
+              onClick={() => setIsWordsOpen((prev) => !prev)}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                isWordsActive && !isWordsOpen
+                  ? 'bg-rose-600 text-white shadow-sm'
+                  : isWordsActive
+                  ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-200 border border-rose-300/80 dark:border-rose-800'
+                  : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span
+                  className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-black flex-shrink-0 ${
+                    isWordsActive && !isWordsOpen
+                      ? 'bg-white/25 text-white'
+                      : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                  }`}
+                >
+                  15
+                </span>
+                <BookText className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0" />
+                <div className="flex items-center gap-1.5 truncate">
+                  <span className="font-bold truncate">Words</span>
+                  <span className="text-[10px] font-marathi text-slate-400 dark:text-slate-500 font-normal">
+                    (शब्द)
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 flex-shrink-0">
+                {bookmarks.includes('words') && (
+                  <Bookmark className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
+                )}
+                {completedLessons.includes('words') && (
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                )}
+                {isWordsOpen ? (
+                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                )}
+              </div>
+            </button>
+
+            {isWordsOpen && (
+              <div className="mt-1 ml-3.5 pl-3 border-l-2 border-rose-200 dark:border-rose-900/60 space-y-1 py-0.5 animate-in fade-in duration-150">
+                <button
+                  id="sidebar-nav-words-overview"
+                  type="button"
+                  onClick={() => handleItemClick('words')}
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    activeId === 'words'
+                      ? 'bg-rose-600 text-white font-bold shadow-xs'
+                      : 'text-rose-700 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40'
+                  }`}
+                >
+                  <span className="truncate">Overview</span>
+                  <span className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${activeId === 'words' ? 'text-rose-100' : 'text-rose-500'}`}>
+                    सर्व शब्द
+                  </span>
+                </button>
+
+                {[
+                  { id: 'words-verbs', name: 'Verbs', marathi: '१०० क्रियापदे (V¹-V³)' },
+                  { id: 'words-nouns', name: 'Nouns', marathi: '५० नाम' },
+                ].map((item, idx) => {
+                  const isSelected = activeId === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      id={`sidebar-nav-${item.id}`}
+                      type="button"
+                      onClick={() => handleItemClick(item.id)}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        isSelected
+                          ? 'bg-rose-600 text-white font-bold shadow-xs'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 truncate">
+                        <span className="text-[10px] text-slate-400 font-mono">{idx + 1}.</span>
+                        <span className="truncate font-semibold">{item.name}</span>
+                      </div>
+                      <span
+                        className={`text-[9px] font-marathi ml-1 flex-shrink-0 ${
+                          isSelected
+                            ? 'text-rose-100'
+                            : 'text-slate-400 dark:text-slate-500'
+                        }`}
+                      >
+                        {item.marathi}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </nav>
       </div>
 
@@ -1978,7 +1994,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   {/* Compact rail content when collapsed on desktop */}
   const collapsedNavContent = (
-    <div className="flex flex-col h-full justify-between items-center py-3 px-1.5 w-16 select-none">
+    <div
+      onMouseEnter={handleOpenFromCollapsed}
+      className="flex flex-col h-full justify-between items-center py-3 px-1.5 w-16 select-none"
+    >
       {/* Top action: Expand Sidebar button */}
       <div className="flex flex-col items-center gap-2 w-full">
         {onToggleDesktopCollapsed && (
@@ -1986,6 +2005,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             id="sidebar-expand-rail-btn"
             type="button"
             onClick={onToggleDesktopCollapsed}
+            onMouseEnter={handleOpenFromCollapsed}
             className="group relative flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900 border border-indigo-200 dark:border-indigo-800 transition-all shadow-xs cursor-pointer"
             title="Expand Sidebar (Ctrl+B)"
           >
@@ -1999,7 +2019,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="w-8 h-px bg-slate-200 dark:bg-slate-800 my-0.5" />
 
         {/* Scrollable compact icon list */}
-        <div className="flex flex-col items-center gap-1.5 w-full overflow-y-auto max-h-[calc(100vh-14rem)] py-1 no-scrollbar">
+        <div
+          onMouseEnter={handleOpenFromCollapsed}
+          className="flex flex-col items-center gap-1.5 w-full overflow-y-auto max-h-[calc(100vh-14rem)] py-1 no-scrollbar"
+        >
           {/* Dashboard */}
           <button
             id="rail-nav-home"
@@ -2056,43 +2079,61 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <div className="w-8 h-px bg-slate-200 dark:bg-slate-800 my-1" />
 
-          {/* 1. Parts of Speech */}
-          <button
-            id="rail-nav-pos"
-            type="button"
-            onClick={() => handleItemClick('noun')}
-            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
-              parts.some((p) => p.id === activeId)
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
-          >
-            <Layers className="w-4 h-4" />
-            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
-              <span>1. Parts of Speech</span>
-              <span className="text-[10px] text-blue-300 font-marathi">शब्दांच्या जाती (८)</span>
-            </div>
-          </button>
-
-          {/* 2. Articles */}
+          {/* 1. Articles */}
           <button
             id="rail-nav-articles"
             type="button"
             onClick={() => handleItemClick('articles')}
             className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
               activeId === 'articles'
-                ? 'bg-emerald-600 text-white shadow-md'
+                ? 'bg-blue-600 text-white shadow-md'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <BookOpen className="w-4 h-4" />
             <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
-              <span>2. Articles</span>
-              <span className="text-[10px] text-emerald-300 font-marathi">A, An, The (उपपदे)</span>
+              <span>1. Articles</span>
+              <span className="text-[10px] text-blue-300 font-marathi">A, An, The (उपपदे)</span>
             </div>
           </button>
 
-          {/* 3. Cases */}
+          {/* 2. Parts of Speech */}
+          <button
+            id="rail-nav-pos"
+            type="button"
+            onClick={() => handleItemClick('noun')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              parts.some((p) => p.id === activeId)
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>2. Parts of Speech</span>
+              <span className="text-[10px] text-indigo-300 font-marathi">शब्दांच्या जाती (८)</span>
+            </div>
+          </button>
+
+          {/* 3. Main vs Helping Verbs */}
+          <button
+            id="rail-nav-verbs-comparison"
+            type="button"
+            onClick={() => handleItemClick('verbs-comparison')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              activeId === 'verbs-comparison'
+                ? 'bg-emerald-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Compass className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>3. Main vs Helping Verbs</span>
+              <span className="text-[10px] text-emerald-300 font-marathi">मुख्य व सहाय्यकारी क्रियापदे</span>
+            </div>
+          </button>
+
+          {/* 4. Cases */}
           <button
             id="rail-nav-cases"
             type="button"
@@ -2105,26 +2146,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <BookMarked className="w-4 h-4" />
             <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
-              <span>3. Cases (विभक्ती)</span>
+              <span>4. Cases (विभक्ती)</span>
               <span className="text-[10px] text-purple-300 font-marathi">Nominative, Objective...</span>
-            </div>
-          </button>
-
-          {/* 4. Verbs Comparison */}
-          <button
-            id="rail-nav-verbs-comparison"
-            type="button"
-            onClick={() => handleItemClick('verbs-comparison')}
-            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
-              activeId === 'verbs-comparison'
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
-          >
-            <Compass className="w-4 h-4" />
-            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
-              <span>4. Main vs Helping Verbs</span>
-              <span className="text-[10px] text-indigo-300 font-marathi">मुख्य व सहाय्यकारी क्रियापदे</span>
             </div>
           </button>
 
@@ -2221,25 +2244,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </button>
 
-          {/* 10. Words */}
-          <button
-            id="rail-nav-words"
-            type="button"
-            onClick={() => handleItemClick('words')}
-            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
-              isWordsActive
-                ? 'bg-teal-600 text-white shadow-md'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
-          >
-            <BookText className="w-4 h-4" />
-            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
-              <span>10. Words (शब्द संग्रह)</span>
-              <span className="text-[10px] text-teal-300 font-marathi">V1-V2-V3 Verbs & Nouns</span>
-            </div>
-          </button>
-
-          {/* 11. Modals */}
+          {/* 10. Modals */}
           <button
             id="rail-nav-modals"
             type="button"
@@ -2252,12 +2257,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <Award className="w-4 h-4" />
             <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
-              <span>11. Modal Auxiliaries</span>
+              <span>10. Modal Auxiliaries</span>
               <span className="text-[10px] text-indigo-300 font-marathi">Can, Could, Should...</span>
             </div>
           </button>
 
-          {/* 12. Dummy Subject */}
+          {/* 11. Dummy Subject */}
           <button
             id="rail-nav-dummy"
             type="button"
@@ -2270,12 +2275,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <CircleDot className="w-4 h-4" />
             <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
-              <span>12. Dummy Subject (It & There)</span>
+              <span>11. Dummy Subject (It & There)</span>
               <span className="text-[10px] text-sky-300 font-marathi">वेळ, हवामान, अस्तित्व</span>
             </div>
           </button>
 
-          {/* 13. For vs Since */}
+          {/* 12. For vs Since */}
           <button
             id="rail-nav-for-since"
             type="button"
@@ -2288,12 +2293,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <Timer className="w-4 h-4" />
             <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
-              <span>13. For vs Since</span>
+              <span>12. For vs Since</span>
               <span className="text-[10px] text-violet-300 font-marathi">कालावधी vs ठरावीक वेळ</span>
             </div>
           </button>
 
-          {/* 14. Combined Tenses */}
+          {/* 13. Combined Tenses */}
           <button
             id="rail-nav-combined"
             type="button"
@@ -2306,12 +2311,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <GitMerge className="w-4 h-4" />
             <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
-              <span>14. Combined Tenses</span>
+              <span>13. Combined Tenses</span>
               <span className="text-[10px] text-fuchsia-300 font-marathi">एकत्रित काळ रचना</span>
             </div>
           </button>
 
-          {/* 15. Other Structures */}
+          {/* 14. Other Structures */}
           <button
             id="rail-nav-other"
             type="button"
@@ -2327,8 +2332,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="absolute -bottom-1 -right-1 text-[8px] font-bold font-mono bg-indigo-500 text-white rounded-full px-0.5 leading-none">16</span>
             </div>
             <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
-              <span>15. Other Structures</span>
+              <span>14. Other Structures</span>
               <span className="text-[10px] text-indigo-300 font-marathi">१६ महत्त्वाच्या रचना</span>
+            </div>
+          </button>
+
+          {/* 15. Words */}
+          <button
+            id="rail-nav-words"
+            type="button"
+            onClick={() => handleItemClick('words')}
+            className={`group relative flex items-center justify-center w-10 h-10 rounded-xl transition-all cursor-pointer ${
+              isWordsActive
+                ? 'bg-rose-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <BookText className="w-4 h-4" />
+            <div className="pointer-events-none absolute left-full ml-3 z-50 hidden group-hover:flex flex-col px-2.5 py-1 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+              <span>15. Words (शब्द संग्रह)</span>
+              <span className="text-[10px] text-rose-300 font-marathi">V1-V2-V3 Verbs & Nouns</span>
             </div>
           </button>
         </div>
@@ -2358,8 +2381,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Desktop fixed sidebar (collapsible between w-72 and w-16) */}
       <aside
         id="desktop-sidebar"
+        onMouseEnter={handleOpenFromCollapsed}
         className={`hidden lg:block ${
-          isDesktopCollapsed ? 'w-16' : 'w-72'
+          isDesktopCollapsed ? 'w-16 cursor-pointer' : 'w-72'
         } flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm h-[calc(100vh-4.5rem)] sticky top-18 overflow-y-auto transition-all duration-300 ease-in-out`}
       >
         {isDesktopCollapsed ? collapsedNavContent : navContent}

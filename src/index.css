@@ -2,28 +2,19 @@
 
 @layer base {
   :root {
-    --bg-main: #f8fafc;
+    --bg-main: #ffffff;
     --sidebar-bg: #ffffff;
     --primary: #4f46e5;
     --primary-hover: #4338ca;
     --primary-accent: #818cf8;
     --card-border: #e2e8f0;
-    --card-hover: #f1f5f9;
-  }
-
-  .dark {
-    --bg-main: #0b0f19;
-    --sidebar-bg: #0f172a;
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --primary-accent: #a5b4fc;
-    --card-border: #1e293b;
-    --card-hover: #1e293b/50;
+    --card-hover: #f8fafc;
   }
 
   body {
     font-family: 'Plus Jakarta Sans', 'Inter', 'Mukta', system-ui, -apple-system, sans-serif;
     background-color: var(--bg-main);
+    color: #0f172a;
   }
 }
 
@@ -61,4 +52,34 @@
   background: rgba(148, 163, 184, 0.7);
 }
 
+@keyframes arrow-bounce-x {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
 
+.animate-arrow-bounce {
+  display: inline-flex;
+  animation: arrow-bounce-x 1.2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.4));
+  }
+}
+
+/* Ensure all sidebar navigation buttons and triggers have pointer cursor on hover */
+aside button,
+nav button,
+[id^="sidebar-"],
+[id^="rail-nav-"] {
+  cursor: pointer;
+}

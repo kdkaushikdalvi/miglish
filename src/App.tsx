@@ -54,6 +54,13 @@ export default function App() {
     });
   };
 
+  const handleExpandDesktopSidebar = () => {
+    setIsDesktopSidebarCollapsed(false);
+    try {
+      localStorage.setItem('minglish_sidebar_collapsed', 'false');
+    } catch {}
+  };
+
   // Keyboard shortcut: Ctrl+B or Cmd+B to collapse/expand desktop sidebar
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -79,6 +86,13 @@ export default function App() {
     setBookmarks(getBookmarks());
     setCompletedLessons(getCompletedLessons());
     setQuizScores(getQuizScores());
+    // Ensure pure light white theme across the entire application
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.remove('dark');
+      try {
+        localStorage.removeItem('pos_theme');
+      } catch {}
+    }
   }, []);
 
   const handleToggleBookmark = (id: string) => {
@@ -129,7 +143,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans transition-colors duration-200">
       {/* Header */}
       <Header
         searchQuery={searchQuery}
@@ -139,16 +153,6 @@ export default function App() {
             setActiveView('home');
           }
         }}
-        filterSavedOnly={filterSavedOnly}
-        onToggleFilterSaved={() => {
-          setFilterSavedOnly(!filterSavedOnly);
-          if (activeView !== 'home') {
-            setActiveView('home');
-          }
-        }}
-        bookmarksCount={bookmarks.length}
-        completedCount={completedLessons.length}
-        totalCount={PARTS_OF_SPEECH.length}
         activeView={activeView}
         onSelectView={handleSelectView}
         isMobileSidebarOpen={isMobileSidebarOpen}
@@ -170,6 +174,7 @@ export default function App() {
           onCacheCleared={handleCacheCleared}
           isDesktopCollapsed={isDesktopSidebarCollapsed}
           onToggleDesktopCollapsed={handleToggleDesktopSidebar}
+          onExpandDesktop={handleExpandDesktopSidebar}
         />
 
         {/* Main Content Area */}
